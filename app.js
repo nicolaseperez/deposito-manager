@@ -58,7 +58,7 @@ const navLogoutBtn     = document.getElementById('nav-logout-btn');
 // =============================================
 auth.onAuthStateChanged(user => {
   currentUser = user;
-  isAdmin = user?.email === ADMIN_EMAIL;
+  isAdmin = ADMIN_EMAILS.includes(user?.email);
   updateNavbar();
   loadArticles();
 });

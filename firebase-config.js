@@ -20,5 +20,8 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// Email del administrador
-const ADMIN_EMAIL = "pereznicolasemanuel@gmail.com";
+// Emails de los administradores autorizados
+const ADMIN_EMAILS = [
+  "pereznicolasemanuel@gmail.com",
+  "salazar.j.logistica@gmail.com"
+];
