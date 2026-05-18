@@ -1,0 +1,22 @@
+# Archivos sensibles — NO subir al repositorio
+# IMPORTANTE: Si vas a hacer open source, reemplazá las credenciales
+# en firebase-config.js por variables de entorno
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Node (si lo usás en el futuro)
+node_modules/
+npm-debug.log
+
+# Build
+dist/
+.vercel/

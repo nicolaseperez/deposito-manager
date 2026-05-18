@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de gestión de inventario para depósito — buscá y administrá artículos fácilmente.">
+  <title>Depósito Manager</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body>
+
+<!-- ========== LOADING SCREEN ========== -->
+<div id="loading-screen">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">Cargando depósito...</p>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div id="main-content" style="display:none;">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="#">
+      <div class="brand-icon">📦</div>
+      Depósito
+    </a>
+
+    <div class="navbar-actions">
+      <!-- Acciones solo admin -->
+      <div id="nav-admin-actions" style="display:none; align-items:center; gap:6px;">
+        <span class="admin-badge">⚙️ Admin</span>
+      </div>
+
+      <!-- Usuario logueado -->
+      <div id="nav-user-info" class="user-info" style="display:none;">
+        <div class="user-avatar" id="nav-user-avatar">A</div>
+        <button class="btn btn-ghost btn-sm" id="nav-logout-btn" title="Cerrar sesión">
+          Salir
+        </button>
+      </div>
+
+      <!-- Botón login -->
+      <button class="btn btn-ghost btn-sm" id="nav-login-btn">
+        🔐 Admin
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+
+    <!-- SEARCH -->
+    <section class="search-section">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input
+          type="search"
+          id="search-input"
+          placeholder="Buscar por nombre o ubicación..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+        <button class="search-clear" id="search-clear" title="Limpiar búsqueda">✕</button>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <p class="stats-count" id="stats-count"><span>0</span> artículos</p>
+    </div>
+
+    <!-- ARTICLES GRID -->
+    <div class="articles-grid" id="articles-grid">
+      <!-- Cards dinámicas -->
+    </div>
+
+  </main>
+
+  <!-- FAB AGREGAR (solo admin) -->
+  <button class="fab" id="fab-add" title="Agregar artículo" style="display:none;">+</button>
+
+</div><!-- /main-content -->
+
+<!-- =====================================================
+     MODAL: LOGIN
+     ===================================================== -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal" style="max-width:400px;">
+    <div class="login-logo">
+      <div class="logo-icon">📦</div>
+      <h2>Acceso Admin</h2>
+      <p>Solo el administrador puede editar el inventario</p>
+    </div>
+
+    <div class="modal-body" style="padding-top:20px;">
+      <div id="login-error" class="error-msg"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input
+            class="form-input"
+            type="email"
+            id="login-email"
+            placeholder="admin@email.com"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input
+            class="form-input"
+            type="password"
+            id="login-password"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;" type="submit" id="login-btn">
+          Ingresar
+        </button>
+      </form>
+
+      <div style="text-align:center; margin-top:12px;">
+        <button class="btn btn-ghost btn-sm" data-close-modal="login-modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     MODAL: AGREGAR / EDITAR ARTÍCULO
+     ===================================================== -->
+<div class="modal-overlay" id="article-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="article-modal-title">Agregar artículo</h2>
+      <button class="btn btn-ghost btn-icon" data-close-modal="article-modal" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <form id="article-form" novalidate>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="form-label" for="field-name">Nombre <span>*</span></label>
+          <input
+            class="form-input"
+            type="text"
+            id="field-name"
+            placeholder="Ej: Taladro Bosch 650W"
+            required
+            maxlength="120"
+          >
+        </div>
+
+        <!-- Ubicación -->
+        <div class="form-group">
+          <label class="form-label" for="field-location">Ubicación</label>
+          <input
+            class="form-input"
+            type="text"
+            id="field-location"
+            placeholder="Ej: Estante A3 — Fila 2"
+            maxlength="120"
+          >
+        </div>
+
+        <!-- Foto del artículo -->
+        <div class="form-group">
+          <label class="form-label">Foto del artículo</label>
+          <div class="upload-zone" id="zone-photo">
+            <input type="file" id="upload-photo" accept="image/*" capture="environment">
+            <div class="upload-placeholder" style="display:flex; flex-direction:column; align-items:center; pointer-events:none;">
+              <div class="upload-icon">🖼️</div>
+              <p class="upload-label">
+                <strong>Clic para subir</strong> o arrastrá aquí<br>
+                <small style="color:var(--text-muted);">JPG, PNG, WEBP — se comprime a &lt;1MB</small>
+              </p>
+            </div>
+          </div>
+          <div class="upload-preview" id="preview-photo" style="display:none;">
+            <img src="" alt="Vista previa">
+            <button type="button" class="upload-remove" id="remove-photo" title="Quitar foto">✕</button>
+            <p class="upload-size-info"></p>
+          </div>
+        </div>
+
+        <!-- Foto del lugar de referencia -->
+        <div class="form-group">
+          <label class="form-label">Foto lugar de referencia</label>
+          <div class="upload-zone" id="zone-ref">
+            <input type="file" id="upload-ref-photo" accept="image/*" capture="environment">
+            <div class="upload-placeholder" style="display:flex; flex-direction:column; align-items:center; pointer-events:none;">
+              <div class="upload-icon">📍</div>
+              <p class="upload-label">
+                <strong>Clic para subir</strong> o arrastrá aquí<br>
+                <small style="color:var(--text-muted);">Foto del lugar donde está el artículo</small>
+              </p>
+            </div>
+          </div>
+          <div class="upload-preview" id="preview-ref-photo" style="display:none;">
+            <img src="" alt="Vista previa referencia">
+            <button type="button" class="upload-remove" id="remove-ref-photo" title="Quitar foto">✕</button>
+            <p class="upload-size-info"></p>
+          </div>
+        </div>
+
+        <!-- Barra de progreso upload -->
+        <div class="upload-progress" id="upload-progress">
+          <div class="upload-progress-bar" id="upload-progress-bar"></div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="article-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="save-btn">
+            <span id="save-btn-text">Guardar</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     MODAL: DETALLE DEL ARTÍCULO
+     ===================================================== -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="detail-name">Artículo</h2>
+      <button class="btn btn-ghost btn-icon" data-close-modal="detail-modal" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Imágenes -->
+      <div class="detail-images">
+        <div class="detail-img-block" id="detail-img-main-wrap">
+          <label>Foto del artículo</label>
+          <img id="detail-img-main" src="" alt="Foto artículo" title="Clic para ampliar">
+        </div>
+        <div class="detail-img-block" id="detail-img-ref-wrap">
+          <label>Lugar de referencia</label>
+          <img id="detail-img-ref" src="" alt="Foto referencia" title="Clic para ampliar">
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="detail-info">
+        <div class="detail-field">
+          <label>Ubicación</label>
+          <p id="detail-location">—</p>
+        </div>
+      </div>
+
+      <!-- Acciones admin -->
+      <div class="detail-actions" id="detail-admin-actions" style="display:none;">
+        <button class="btn btn-ghost" id="detail-edit-btn">✏️ Editar</button>
+        <button class="btn btn-danger" id="detail-delete-btn">🗑️ Eliminar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     LIGHTBOX
+     ===================================================== -->
+<div class="lightbox" id="lightbox">
+  <img id="lightbox-img" src="" alt="Imagen ampliada">
+  <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar">✕</button>
+</div>
+
+<!-- =====================================================
+     TOAST CONTAINER
+     ===================================================== -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- =====================================================
+     FIREBASE SDKs (compat)
+     ===================================================== -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<!-- Config Firebase (EDITÁ firebase-config.js con tus credenciales) -->
+<script src="firebase-config.js"></script>
+
+<!-- App -->
+<script src="app.js"></script>
+
+</body>
+</html>
