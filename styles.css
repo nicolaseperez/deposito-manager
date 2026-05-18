@@ -917,13 +917,39 @@ body {
    ============================================= */
 @media (max-width: 600px) {
   .navbar { padding: 0 14px; }
-  .main-container { padding: 16px 12px 80px; }
-  .articles-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .main-container { padding: 12px 8px 80px; }
+  
+  /* Mostrar 3 por fila */
+  .articles-grid { 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 6px; 
+  }
+  
+  /* Ajustar tarjetas para tamaño compacto */
+  .article-card {
+    border-radius: var(--radius-sm);
+  }
+  
+  .card-body {
+    padding: 6px 8px 8px;
+  }
+  
+  .card-name {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  
+  .card-location {
+    font-size: 9px;
+    gap: 2px;
+  }
+  
+  .card-location .loc-icon {
+    font-size: 10px;
+  }
+  
   .detail-images { grid-template-columns: 1fr; }
   .modal { border-radius: var(--radius-lg); }
   .fab { bottom: 16px; right: 16px; }
 }
 
-@media (max-width: 400px) {
-  .articles-grid { grid-template-columns: 1fr; }
-}
