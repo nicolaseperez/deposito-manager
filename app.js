@@ -125,8 +125,18 @@ function renderArticles(list) {
     card.className = 'article-card';
     card.onclick = () => openDetailModal(article);
 
+    let deleteBtnHtml = '';
+    if (isAdmin) {
+      deleteBtnHtml = `
+        <button class="card-delete-btn" title="Eliminar artículo" onclick="event.stopPropagation(); deleteArticleDirectly('${article.id}', '${escapeHtml(article.name).replace(/'/g, "\\'")}')">
+          ✕
+        </button>
+      `;
+    }
+
     card.innerHTML = `
       <div class="card-image-wrapper">
+        ${deleteBtnHtml}
         ${article.photoUrl
           ? `<img src="${article.photoUrl}" alt="${escapeHtml(article.name)}" loading="lazy">`
           : `<div class="card-no-image"><div class="no-img-icon">📷</div><span>Sin foto</span></div>`
@@ -541,6 +551,16 @@ async function deleteArticle(article) {
     showToast('Error al eliminar', 'error');
   }
 }
+
+window.deleteArticleDirectly = async function(id, name) {
+  if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) return;
+  try {
+    await db.collection('articles').doc(id).delete();
+    showToast('Artículo eliminado', 'success');
+  } catch (err) {
+    showToast('Error al eliminar', 'error');
+  }
+};
 
 // =============================================
 // LIGHTBOX

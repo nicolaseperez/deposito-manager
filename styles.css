@@ -317,6 +317,37 @@ body {
   overflow: hidden;
 }
 
+/* Botón de borrado directo en tarjetas */
+.card-delete-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  width: 26px;
+  height: 26px;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transition: transform var(--transition), background var(--transition);
+}
+
+.card-delete-btn:hover {
+  background: rgb(239, 68, 68);
+  transform: scale(1.1);
+}
+
+.card-delete-btn:active {
+  transform: scale(0.9);
+}
+
 .card-image-wrapper img {
   width: 100%;
   height: 100%;
@@ -946,6 +977,15 @@ body {
   
   .card-location .loc-icon {
     font-size: 10px;
+  }
+
+  /* Reducir tamaño del botón de eliminar en celular */
+  .card-delete-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+    top: 6px;
+    left: 6px;
   }
   
   .detail-images { grid-template-columns: 1fr; }
